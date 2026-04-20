@@ -27,7 +27,28 @@
   <p id="topic">Click generate to start</p>
 </div>
 
-<button class="generate-btn">Generate Topic</button>
+<button class="generate-btn" onclick="generateTopic()">Generate Topic</button>
+<script>
+function generateTopic() {
+  const topics = [
+    "Is AI replacing creativity?",
+    "Should social media be regulated?",
+    "Is remote work the future?",
+    "Do startups really change the world?"
+  ];
+
+  const random = topics[Math.floor(Math.random() * topics.length)];
+  document.getElementById("topic").innerText = random;
+}
+</script>
+
+
+
+
+
 
 </body>
+
+
+
 </html>
