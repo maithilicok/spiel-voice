@@ -30,16 +30,32 @@
 
 <button class="generate-btn" onclick="generateTopic()">Generate Topic</button>
 <script>
-function generateTopic() {
-  const topics = [
+const topics = {
+  tech: [
     "Is AI replacing creativity?",
-    "Should social media be regulated?",
-    "Is remote work the future?",
-    "Do startups really change the world?"
-  ];
+    "Will Web3 change the internet?",
+    "Is cybersecurity the biggest threat today?"
+  ],
+  career: [
+    "Is college still worth it?",
+    "How important is networking?",
+    "Should you switch careers often?"
+  ],
+  fun: [
+    "Is pineapple on pizza acceptable?",
+    "Would you live on Mars?",
+    "Are video games addictive?"
+  ]
+};
 
-  const random = topics[Math.floor(Math.random() * topics.length)];
-  document.getElementById("topic").innerText = random;
+function generateTopic() {
+  const categories = Object.keys(topics);
+  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+  
+  const selected = topics[randomCategory];
+  const topic = selected[Math.floor(Math.random() * selected.length)];
+
+  document.getElementById("topic").innerText = topic;
 }
 </script>
 
