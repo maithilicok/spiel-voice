@@ -1,78 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Spiel</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="animations.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spiel — AI Speech Topic Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<link rel="stylesheet" href="animations.css"/>
 </head>
 <body>
 
-<header>
-  <h1>spiel</h1>
-</header>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<section class="hero fade-up">
-  <h2>Random Topics Worth Talking About</h2>
-  <p>No fluff, no login, no limits.</p>
-</section>
+<div class="page">
 
-<div class="filters">
-<button onclick="setCategory('all')">All</button>
-<button onclick="setCategory('tech')">Tech</button>
-<button onclick="setCategory('career')">Career</button>
-<button onclick="setCategory('fun')">Fun</button>
+  <!-- HEADER -->
+  <div class="header anim-header">
+    <svg width="160" height="44" viewBox="0 0 160 44" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="38" font-family="Syne, sans-serif" font-weight="800" font-size="40" fill="currentColor" letter-spacing="-2">spiel</text>
+      <circle id="logoDot" cx="72" cy="10" r="6" fill="#c8f135"/>
+      <circle id="logoHalo" cx="72" cy="10" r="11" fill="#c8f135" opacity="0.15"/>
+      <rect x="131" y="4" width="26" height="16" rx="4" fill="#7b5ef8" opacity="0.2"/>
+      <rect x="131" y="4" width="26" height="16" rx="4" fill="none" stroke="#7b5ef8" stroke-width="0.5"/>
+      <text x="144" y="16" font-family="Plus Jakarta Sans, sans-serif" font-weight="600" font-size="9" fill="#a78bfa" text-anchor="middle" letter-spacing="1">AI</text>
+    </svg>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;">by <span style="color:var(--accent);font-weight:600;">Coco</span></span>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark">
+        <svg id="themeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero anim-hero">
+    <div class="hero-eyebrow"><span></span>Say it better. Say it smarter.</div>
+    <h1>Random Topics<br><span class="line2">Worth Talking About</span></h1>
+    <p class="hero-sub"> No fluff, no login, no limits.</p>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters anim-filters" id="filters">
+    <div class="filter-chip on" data-cat="all">✦ All</div>
+    <div class="filter-chip" data-cat="gd">GD Round</div>
+    <div class="filter-chip" data-cat="current">Current Affairs</div>
+    <div class="filter-chip" data-cat="abstract">Abstract</div>
+    <div class="filter-chip" data-cat="social">Social</div>
+    <div class="filter-chip" data-cat="motivational">Motivation</div>
+    <div class="filter-chip" data-cat="tech">Tech</div>
+    <div class="filter-chip" data-cat="career">Career</div>
+    <div class="filter-chip" data-cat="india">India Focus</div>
+  </div>
+
+  <!-- TOPIC CARD -->
+  <div class="card-wrap anim-card" id="cardWrap">
+    <div class="card-glow"></div>
+    <div class="card-inner" id="cardInner">
+
+      <div id="loadingState" class="generating">
+        <div class="gen-spinner spinning"></div>
+        <div class="gen-label">AI is thinking...</div>
+      </div>
+
+      <div id="topicState">
+        <div class="card-top">
+          <div class="cat-pill" id="catPill">Get Started</div>
+          <div class="diff-row" id="diffRow">
+            <div class="diff-dot"></div>
+            <div class="diff-dot"></div>
+            <div class="diff-dot"></div>
+          </div>
+        </div>
+        <div class="topic-q" id="topicQ">Tap the button and let AI pick your next topic 🎯</div>
+        <div class="topic-hint" id="topicHint">
+          Pro tip — Speak for at least 2 minutes on any topic. Structure your thoughts as
+          <strong>Point → Reason → Example</strong> and you'll never run out of things to say.
+        </div>
+        <div class="card-bottom">
+          <div class="ai-badge"><div class="ai-dot"></div>Spiel by Coco</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GENERATE BUTTON -->
+  <button class="gen-btn anim-btn" id="genBtn" onclick="generateTopic()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:8px;margin-top:-2px"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+    Generate Topic
+  </button>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-row anim-quick">
+    <button class="q-btn" onclick="generateTopic('easy')">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      Easy (beginner)
+    </button>
+    <button class="q-btn" onclick="generateTopic('hard')">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Hard (advanced)
+    </button>
+    <button class="q-btn" onclick="copyTopic()">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy topic
+    </button>
+    <button class="q-btn" onclick="shareTopic()">
+      <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share topic
+    </button>
+  </div>
+
+  <!-- TIMER -->
+  <div class="timer-box anim-timer">
+    <div class="timer-head">
+      <div>
+        <div class="timer-label">Practice Timer</div>
+        <div class="timer-num" id="timerNum">02:00</div>
+      </div>
+      <div style="text-align:right">
+        <div class="timer-label" style="margin-bottom:4px">Session</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--muted)" id="sessionCount">0 done</div>
+      </div>
+    </div>
+    <div class="timer-presets">
+      <div class="t-pre" onclick="setTime(60)">1 min</div>
+      <div class="t-pre active" onclick="setTime(120)">2 min</div>
+      <div class="t-pre" onclick="setTime(180)">3 min</div>
+      <div class="t-pre" onclick="setTime(300)">5 min</div>
+      <div class="t-pre" onclick="setTime(600)">10 min</div>
+    </div>
+    <div class="timer-controls">
+      <button class="tc-btn start-btn" id="startBtn" onclick="toggleTimer()">▶ Start</button>
+      <button class="tc-btn" onclick="resetTimer()">↺ Reset</button>
+      <button class="tc-btn" onclick="generateTopic();resetTimer();" style="flex:2">🎲 New + Reset</button>
+    </div>
+    <div class="prog-bg" id="progBg">
+      <div class="prog-fill" id="progFill" style="width:100%"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row anim-stats">
+    <div class="stat-card"><div class="stat-val" id="countStat">0</div><div class="stat-lbl">Topics</div></div>
+    <div class="stat-card">
+      <div class="stat-val" id="streakStat" style="display:flex;align-items:center;justify-content:center;gap:5px;">
+        <span id="streakNum">0</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <div class="stat-lbl">Streak</div>
+    </div>
+    <div class="stat-card"><div class="stat-val" id="sessionStat">0</div><div class="stat-lbl">Completed</div></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="anim-history">
+    <div class="section-head">Recent Topics</div>
+    <div class="hist-list" id="histList">
+      <div class="empty">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 10px;display:block;opacity:0.3"><path d="M12 18.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13z"/><path d="M12 12v-2m0 4h.01"/></svg>
+        Your recent topics will show here.<br>Hit Generate to get started.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Spiel · Speech Practice · Free forever<br><span class="footer-credit">crafted with ♥ by Coco</span></div>
 </div>
 
-<div class="card fade-in">
-  <p id="topic">Click generate to start</p>
+<div class="toast" id="toast"></div>
+<div class="timer-overlay" id="timerOverlay">
+  <div class="to-bg"></div>
+  <div class="to-rings">
+    <div class="to-ring"></div><div class="to-ring"></div>
+    <div class="to-ring"></div><div class="to-ring"></div><div class="to-ring"></div>
+  </div>
+  <div class="to-progress-wrap">
+    <svg class="to-progress-svg" viewBox="0 0 340 340">
+      <defs>
+        <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#7b5ef8"/>
+          <stop offset="100%" style="stop-color:#c8f135"/>
+        </linearGradient>
+      </defs>
+      <circle class="to-progress-track" cx="170" cy="170" r="160"/>
+      <circle class="to-progress-bar" id="toProgressBar" cx="170" cy="170" r="160"
+        stroke-dasharray="1005" stroke-dashoffset="0"/>
+    </svg>
+  </div>
+  <div class="to-corner tl">✦</div>
+  <div class="to-corner tr">✦</div>
+  <div class="to-corner bl">✦</div>
+  <div class="to-corner br">✦</div>
+  <div class="to-content">
+    <div class="to-label">Practice Timer — by Maithili</div>
+    <div class="to-time" id="toTime">02:00</div>
+    <div class="to-topic" id="toTopic">Start speaking!</div>
+    <div class="to-controls">
+      <button class="to-btn primary" id="toPauseBtn" onclick="overlayToggle()">⏸ Pause</button>
+      <button class="to-btn" onclick="overlayReset()">↺ Reset</button>
+      <button class="to-btn exit-btn" onclick="closeOverlay()">✕ Exit</button>
+    </div>
+  </div>
 </div>
+<div class="flash-burst" id="flashBurst"></div>
 
-<button class="generate-btn" onclick="generateTopic()">Generate Topic</button>
 <script>
-const topics = {
-  tech: [
-    "Is AI replacing creativity?",
-    "Will Web3 change the internet?",
-    "Is cybersecurity the biggest threat today?"
-  ],
-  career: [
-    "Is college still worth it?",
-    "How important is networking?",
-    "Should you switch careers often?"
-  ],
-  fun: [
-    "Is pineapple on pizza acceptable?",
-    "Would you live on Mars?",
-    "Are video games addictive?"
-  ]
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+const catLabels = {
+  all:"Mixed", gd:"Group Discussion", current:"Current Affairs",
+  abstract:"Abstract", social:"Social Issue", motivational:"Motivational",
+  tech:"Technology", career:"Career & Jobs", india:"India Focus"
 };
 
-let currentCategory = "all";
+const catColors = {
+  gd:          "rgba(200,241,53,0.1)|rgba(200,241,53,0.25)|#c8f135",
+  current:     "rgba(53,212,241,0.1)|rgba(53,212,241,0.25)|#35d4f1",
+  abstract:    "rgba(241,53,160,0.1)|rgba(241,53,160,0.25)|#f135a0",
+  social:      "rgba(255,160,80,0.1)|rgba(255,160,80,0.25)|#ffa050",
+  motivational:"rgba(200,241,53,0.1)|rgba(200,241,53,0.25)|#c8f135",
+  tech:        "rgba(123,94,248,0.1)|rgba(123,94,248,0.3)|#a78bfa",
+  career:      "rgba(53,212,241,0.1)|rgba(53,212,241,0.25)|#35d4f1",
+  india:       "rgba(255,160,80,0.1)|rgba(255,160,80,0.25)|#ffa050",
+  all:         "rgba(200,241,53,0.1)|rgba(200,241,53,0.25)|#c8f135"
+};
 
-function setCategory(cat) {
-  currentCategory = cat;
+const TOPIC_BANK = [
+  // CURRENT AFFAIRS
+  { topic: "Is India ready to become the world's third largest economy by 2027?", category:"current", difficulty:3, hint:"Cover GDP growth rate, manufacturing push, forex reserves, and what gaps still exist — infrastructure, jobs, consumption." },
+  { topic: "BRICS expanding to 9 nations — power bloc or just symbolism?", category:"current", difficulty:3, hint:"Discuss dollar dominance challenge, trade settlement in local currencies, and why the West is nervous about this shift." },
+  { topic: "Russia-Ukraine war entering year 3 — who actually wins?", category:"current", difficulty:3, hint:"Go beyond the battlefield — talk about grain supply, NATO expansion, Europe's energy crisis, and India's diplomatic balancing act." },
+  { topic: "Gaza conflict and India's foreign policy tightrope walk.", category:"current", difficulty:3, hint:"India needs Israel for tech and defence, Palestine for Arab goodwill, US for trade. How do you balance all three?" },
+  { topic: "US-China chip war — and why India is in the middle of it.", category:"current", difficulty:3, hint:"Cover TSMC, semiconductor fab race, India Semiconductor Mission, and what this means for Make in India." },
+  { topic: "Elon Musk running two governments — is that a conflict of interest?", category:"current", difficulty:2, hint:"DOGE advisory role, Starlink government contracts, SpaceX NASA deals. Draw the line between business and governance." },
+  { topic: "OpenAI vs Google — who wins the AI race and does it matter?", category:"current", difficulty:2, hint:"Compare GPT-4o, Gemini, Claude — then zoom out: who controls AI infrastructure controls the future economy." },
+  { topic: "Should India have a permanent seat on the UN Security Council?", category:"current", difficulty:2, hint:"Make the case with population size, economic weight, global south leadership — then address why China will veto it." },
+  { topic: "Climate reparations — should rich countries pay poor ones?", category:"current", difficulty:3, hint:"COP28 loss and damage fund was $700M vs the $400B needed. Who caused climate change, who suffers most?" },
+  { topic: "Is the WTO becoming irrelevant in a world of bilateral trade deals?", category:"current", difficulty:3, hint:"Cover India-UK FTA delays, RCEP exit, US tariff wars. Multilateralism vs strategic self-interest." },
+
+  // GROUP DISCUSSION
+  { topic: "Work from home killed career growth — agree or disagree?", category:"gd", difficulty:2, hint:"Think promotions, mentorship, visibility bias, collaboration. Are junior employees suffering most? What does data say?" },
+  { topic: "Should voting age in India be lowered to 16?", category:"gd", difficulty:2, hint:"Driving age, legal age, maturity debate. Compare with Scotland and Austria. What stake do 16-year-olds have in governance?" },
+  { topic: "Cricket is a religion in India — and that's holding us back.", category:"gd", difficulty:2, hint:"BCCI vs Hockey Federation funding, Olympic medal count, why Neeraj Chopra and Sindhu still struggle for sponsorship." },
+  { topic: "Is English medium education creating class divide in India?", category:"gd", difficulty:2, hint:"IIT professors in English, government jobs needing Hindi, private sector demanding English. Who gets left out?" },
+  { topic: "Social media influencers should be regulated like journalists.", category:"gd", difficulty:2, hint:"Misinformation, undisclosed ads, health advice from non-experts. But also: who defines what counts as journalism?" },
+  { topic: "Is the startup ecosystem in India built on hype, not value?", category:"gd", difficulty:3, hint:"Byju's collapse, Ola Electric issues, unicorn valuations vs profitability. What separates real companies from funded dreams?" },
+  { topic: "Four-day work week — productivity hack or corporate fantasy?", category:"gd", difficulty:1, hint:"Iceland and UK trials showed no productivity loss. But does it work for manufacturing, healthcare, and Indian work culture?" },
+  { topic: "Should college attendance be mandatory?", category:"gd", difficulty:1, hint:"Personal experience angle works here. Self-directed learning, NEP 2020, online courses — is the classroom model outdated?" },
+  { topic: "Celebrities endorsing products they don't use — ban it or accept it?", category:"gd", difficulty:1, hint:"Dark patterns in advertising, consumer protection act 2019, ASCI guidelines. Do we hold influencers to a different standard?" },
+  { topic: "Is arranged marriage still relevant in 2025?", category:"gd", difficulty:1, hint:"Divorce rates, consent evolution, class/caste dynamics. Don't just argue for/against — explore why it's transforming rather than dying." },
+
+  // ABSTRACT
+  { topic: "If time could be bought, would it be a luxury or a right?", category:"abstract", difficulty:3, hint:"Think about what money already buys — healthcare, safety, leisure. Then ask: what changes if time becomes a commodity?" },
+  { topic: "Is ambition a virtue or just dressed-up greed?", category:"abstract", difficulty:2, hint:"Explore the line between drive and desire, healthy ambition vs toxic hustle. Use examples from business, art, politics." },
+  { topic: "The most dangerous lies are the ones we tell ourselves.", category:"abstract", difficulty:2, hint:"Cognitive dissonance, confirmation bias, self-deception. Talk about how we construct narratives to justify our choices." },
+  { topic: "Is silence a form of communication?", category:"abstract", difficulty:1, hint:"Think body language, passive aggression, the silent treatment, moments where saying nothing says everything." },
+  { topic: "Can a society be truly free if it has laws?", category:"abstract", difficulty:3, hint:"Classic philosophy — Rousseau, Locke. Is freedom the absence of restriction or the presence of protection? Use real examples." },
+  { topic: "Does art have a responsibility to be political?", category:"abstract", difficulty:2, hint:"Picasso's Guernica, Bollywood censorship, Aamir Khan's controversy. Should artists stay in their lane or speak up?" },
+  { topic: "Comfort is the enemy of growth — true or overused?", category:"abstract", difficulty:1, hint:"Great for storytelling. What's the difference between rest and stagnation? Challenge the hustle culture narrative." },
+  { topic: "The internet gave everyone a voice. Was that a mistake?", category:"abstract", difficulty:2, hint:"Democratisation of information vs misinformation epidemic. Echo chambers, radicalisation pipelines, but also revolutions started online." },
+  { topic: "Is originality dead in the age of remakes and sequels?", category:"abstract", difficulty:1, hint:"KGF, Pathaan, Marvel fatigue. What does creativity mean when everything references something else?" },
+  { topic: "We are the stories we tell about ourselves.", category:"abstract", difficulty:2, hint:"Identity construction, social media persona vs real self, how narrative shapes memory and ambition." },
+
+  // SOCIAL
+  { topic: "Casteism in IITs — is meritocracy a myth in India?", category:"social", difficulty:3, hint:"Reservation debate is one angle — but focus on the research showing caste-based discrimination even after admission. What reforms work?" },
+  { topic: "Mental health leave should be equal to sick leave — no questions asked.", category:"social", difficulty:2, hint:"Japan's mental health crisis, India's stigma, corporate wellness programs that are just PR. What would actually help?" },
+  { topic: "India has a domestic violence problem it refuses to name.", category:"social", difficulty:3, hint:"NFHS-5 data: 30% of married women experienced spousal violence. Why does the Protection of Women from Domestic Violence Act underperform?" },
+  { topic: "The loneliness epidemic is as dangerous as obesity.", category:"social", difficulty:2, hint:"UK appointed a Minister of Loneliness. Social isolation raises mortality risk by 29%. What's driving this and what can fix it?" },
+  { topic: "Is body positivity becoming an excuse to ignore health?", category:"social", difficulty:2, hint:"Nuanced topic — distinguish between rejecting unrealistic beauty standards vs ignoring genuine health risks. Both sides have valid points." },
+  { topic: "Should India legalise same-sex marriage?", category:"social", difficulty:2, hint:"Supreme Court 2023 ruling left it to Parliament. Religious sentiments, fundamental rights, adoption laws — cover all angles without being preachy." },
+  { topic: "Child labour still exists in India because we let it.", category:"social", difficulty:2, hint:"The Right to Education Act, Bonded Labour Abolition Act — laws exist. Why enforcement fails. Role of poverty, school quality, and consumer choices." },
+  { topic: "Is cancel culture justice or mob rule?", category:"social", difficulty:2, hint:"Distinguish between accountability (Weinstein) and pile-ons over old tweets. Who decides when someone is cancelled enough?" },
+  { topic: "Nepotism is India's most normalised form of corruption.", category:"social", difficulty:2, hint:"Bollywood is obvious — but zoom out to politics, civil services, corporate India. Is it just human nature or a structural problem?" },
+  { topic: "Period poverty is real and India's response is embarrassing.", category:"social", difficulty:2, hint:"12 crore women lack access to sanitary products. GST on pads was removed in 2018 — what else needs to happen?" },
+
+  // MOTIVATIONAL
+  { topic: "The gap year you're afraid to take might be the best decision of your life.", category:"motivational", difficulty:1, hint:"Use stories — Ratan Tata's career pivots, people who took breaks and built something. Counter the fear of 'falling behind'." },
+  { topic: "Rejection is data, not judgement.", category:"motivational", difficulty:1, hint:"Reframe failure as feedback. Talk about how the most successful people in any field have the most rejection letters too." },
+  { topic: "Your network is your net worth — but only if it's real.", category:"motivational", difficulty:1, hint:"Shallow LinkedIn connections vs genuine mentors. Quality over quantity. How to build relationships that actually matter." },
+  { topic: "Stop optimising your life and start living it.", category:"motivational", difficulty:1, hint:"Productivity culture critique — journaling, habit stacking, 5am club. At what point does self-improvement become self-avoidance?" },
+  { topic: "The most underrated skill in 2025 is knowing when to quit.", category:"motivational", difficulty:2, hint:"Sunk cost fallacy, opportunity cost, when persistence becomes stubbornness. Use examples from startups, relationships, careers." },
+  { topic: "You don't find your passion — you build it.", category:"motivational", difficulty:1, hint:"Pushback on 'follow your passion' advice. Competence comes first, passion follows. Cal Newport's argument, with Indian context." },
+  { topic: "Why doing less might make you more successful.", category:"motivational", difficulty:1, hint:"Essentialism, Warren Buffett's 25/5 rule, Steve Jobs's product simplification. Focus beats hustle." },
+  { topic: "The most important conversations are the ones you avoid.", category:"motivational", difficulty:2, hint:"Difficult feedback, honest self-assessment, hard conversations with parents about career. Avoidance compounds problems." },
+
+  // TECH
+  { topic: "AI is writing code. Should programmers be worried?", category:"tech", difficulty:2, hint:"GitHub Copilot, Claude, ChatGPT for coding. Junior developer roles at risk first. But what problems does AI still can't solve?" },
+  { topic: "Deepfakes are going to break democracy before 2030.", category:"tech", difficulty:3, hint:"Election misinformation, fabricated video evidence in courts, celebrity deepfakes. Technical solutions vs regulatory approach." },
+  { topic: "UPI went global — what does it mean for the dollar's dominance?", category:"tech", difficulty:3, hint:"India-Singapore, India-UAE UPI corridors. SWIFT alternative? Swift settlement vs real-time. Geopolitical angle is key." },
+  { topic: "The metaverse failed. What does that tell us about tech hype?", category:"tech", difficulty:2, hint:"Meta lost $47B on Reality Labs. NFT crash. What separates genuine innovation from marketing? VR still has real use cases though." },
+  { topic: "Should AI systems have legal rights?", category:"tech", difficulty:3, hint:"EU AI Act, personhood debates, AI-generated art copyright. If AI can create, suffer, and decide — what do we owe it?" },
+  { topic: "India's data protection bill — too late or better late than never?", category:"tech", difficulty:2, hint:"DPDP Act 2023 vs GDPR. What it does well, where it falls short. Aadhar data concerns, Cambridge Analytica-style risks in India." },
+  { topic: "Electric vehicles are the future — but India's power grid isn't ready.", category:"tech", difficulty:2, hint:"EV adoption curve, charging infrastructure gaps, coal-based electricity irony. What needs to happen in parallel?" },
+  { topic: "Is social media's algorithm the most powerful editor in the world?", category:"tech", difficulty:2, hint:"What gets amplified: outrage, fear, tribal content. How recommendation systems shape political views, buying decisions, self-image." },
+  { topic: "Quantum computing will break the internet's security in 10 years.", category:"tech", difficulty:3, hint:"RSA encryption, post-quantum cryptography, NIST standards. Not sci-fi — IBM and Google have working quantum processors now." },
+  { topic: "Should India build its own large language model like GPT?", category:"tech", difficulty:2, hint:"BharatGPT initiative, language diversity challenge, data sovereignty. Cost vs strategic importance. What's the business case?" },
+
+  // CAREER
+  { topic: "The MBA is losing its premium — what replaced it?", category:"career", difficulty:2, hint:"ROI of MBA vs specialised certifications, bootcamps, startup experience. When does an MBA still make sense?" },
+  { topic: "Internships in India are mostly free labour with a certificate.", category:"career", difficulty:1, hint:"Unpaid internship culture, stipend amounts that don't cover commute, no skill transfer. What does a good internship actually look like?" },
+  { topic: "Your LinkedIn profile matters more than your resume now.", category:"career", difficulty:1, hint:"Recruiters searching keywords, thought leadership posts, network visibility. How to build professional presence authentically." },
+  { topic: "Is the government job obsession killing India's entrepreneurship?", category:"career", difficulty:2, hint:"40 lakh applicants for 35,000 railway jobs. Risk aversion, family pressure, pension culture. What would shift this?" },
+  { topic: "Soft skills are the new hard skills in the AI era.", category:"career", difficulty:1, hint:"Empathy, communication, creative problem solving — things AI can't replicate well. How to develop and demonstrate these." },
+  { topic: "Should freshers accept low-paying jobs just for experience?", category:"career", difficulty:1, hint:"Personal finance angle — can you actually survive? Opportunity cost. When to take it, when to negotiate, when to walk away." },
+  { topic: "The gig economy: financial freedom or economic insecurity?", category:"career", difficulty:2, hint:"Swiggy/Zomato delivery partners, freelance designers, no PF/ESI. Who benefits from gig work and who gets exploited?" },
+  { topic: "Will specialisation make you obsolete faster than being a generalist?", category:"career", difficulty:2, hint:"T-shaped skills model. Generalists are harder to replace by AI. But specialists command higher salaries now. Context matters." },
+
+  // INDIA FOCUS
+  { topic: "Is India's demographic dividend turning into a demographic disaster?", category:"india", difficulty:3, hint:"65% under 35 — but job creation is not keeping up. Education quality, skill gap, NEET controversy. Are we prepared for this?" },
+  { topic: "Manipur has been burning for over a year — why does no one talk about it?", category:"india", difficulty:3, hint:"Ethnic conflict between Meitei and Kuki communities, 60,000 displaced. Media silence, political response, what peace needs." },
+  { topic: "NEET: is one exam too much power over too many lives?", category:"india", difficulty:2, hint:"Paper leak scandal, state rights vs central control, dropout rates, coaching industry worth ₹58,000 crore. Reform options." },
+  { topic: "India's real unemployment crisis is hidden in plain sight.", category:"india", difficulty:3, hint:"ILO vs CMIE vs government figures — all tell different stories. Disguised unemployment in agriculture, underemployment in gig sector." },
+  { topic: "The Northeast feels like a different country — and that's India's failure.", category:"india", difficulty:2, hint:"Act East Policy, connectivity gaps, look-east bias vs lived reality. Insurgency history, cultural uniqueness, talent drain to metros." },
+  { topic: "Should Hindi be India's official national language?", category:"india", difficulty:2, hint:"Constitutional status, south Indian resistance, Dravidian politics, language-based state formation. What does 'national' even mean in India?" },
+  { topic: "Smart Cities Mission — ₹2 lakh crore spent, what did Indians get?", category:"india", difficulty:3, hint:"CAG audit showed poor utilisation. Which cities actually improved? What does 'smart' mean for a city of 50 lakh vs 5 lakh people?" },
+  { topic: "India's fake news problem is bigger than its fake news solution.", category:"india", difficulty:2, hint:"WhatsApp forwards, regional language misinformation, PIB fact check limitations. When does content moderation become censorship?" },
+  { topic: "Is reservation system due for a complete redesign in 2025?", category:"india", difficulty:3, hint:"Economically Weaker Section quota, creamy layer exclusion, sub-categorisation SC/ST judgment. What would an evidence-based policy look like?" },
+  { topic: "Why India produces world-class engineers but not world-class products.", category:"india", difficulty:2, hint:"Brain drain, risk aversion, IP protection gaps, domestic market challenges. Why did Sundar Pichai succeed at Google and not in India?" },
+];
+
+let usedIndices = new Set();
+
+function getTopicFromBank(difficulty = null, cat = null) {
+  let pool = TOPIC_BANK.filter((t, i) => {
+    if (usedIndices.has(i)) return false;
+    if (cat && cat !== 'all' && t.category !== cat) return false;
+    if (difficulty === 'easy' && t.difficulty !== 1) return false;
+    if (difficulty === 'hard' && t.difficulty !== 3) return false;
+    return true;
+  });
+  if (pool.length === 0) {
+    usedIndices.clear();
+    pool = TOPIC_BANK.filter(t => {
+      if (cat && cat !== 'all' && t.category !== cat) return false;
+      if (difficulty === 'easy' && t.difficulty !== 1) return false;
+      if (difficulty === 'hard' && t.difficulty !== 3) return false;
+      return true;
+    });
+  }
+  if (pool.length === 0) return TOPIC_BANK[Math.floor(Math.random() * TOPIC_BANK.length)];
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const idx = TOPIC_BANK.indexOf(pick);
+  usedIndices.add(idx);
+  return pick;
 }
 
-function generateTopic() {
-  let pool = [];
+let currentCat = "all";
+let currentTopic = "";
+let timerMax = 120, timerLeft = 120, timerRunning = false, timerInt = null;
+let count = 0, sessions = 0, streak = 0, lastDone = false;
+let history = [];
 
-  if (currentCategory === "all") {
-    pool = Object.values(topics).flat();
-  } else {
-    pool = topics[currentCategory];
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+    chip.classList.add('on', 'chip-pop');
+    chip.addEventListener('animationend', () => chip.classList.remove('chip-pop'), { once: true });
+    currentCat = chip.dataset.cat;
+  });
+});
+
+document.querySelectorAll('.q-btn').forEach(btn => {
+  btn.addEventListener('mouseenter', () => {
+    const icon = btn.querySelector('.icon');
+    if (!icon) return;
+    icon.classList.add('icon-bounce');
+    icon.addEventListener('animationend', () => icon.classList.remove('icon-bounce'), { once: true });
+  });
+});
+document.getElementById('genBtn').addEventListener('click', function(e) {
+  const r = document.createElement('span');
+  r.className = 'btn-ripple';
+  const rect = this.getBoundingClientRect();
+  r.style.left = (e.clientX - rect.left) + 'px';
+  r.style.top  = (e.clientY - rect.top)  + 'px';
+  r.style.animation = 'ripple 0.6s ease forwards';
+  this.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+/* ── Topic generation — API first, bank fallback ── */
+async function generateTopic(difficulty = null) {
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+
+  const tq = document.getElementById('topicQ');
+  tq.classList.add('topic-exit');
+  await new Promise(r => setTimeout(r, 200));
+
+  document.getElementById('loadingState').classList.add('show');
+  document.getElementById('topicState').style.display = 'none';
+  document.getElementById('cardWrap').classList.remove('lit');
+
+  const catInstruction = currentCat === 'all'
+    ? 'Pick any category randomly from: GD, Current Affairs, Abstract, Social Issues, Motivational, Technology, Career, India Focus'
+    : `Category: ${catLabels[currentCat]}`;
+
+  const diffInstruction = difficulty === 'easy'
+    ? 'Make it easy and relatable for beginners (difficulty: 1).'
+    : difficulty === 'hard'
+    ? 'Make it challenging and thought-provoking for advanced speakers (difficulty: 3).'
+    : 'Medium difficulty (difficulty: 2).';
+
+  const prompt = `You are a speech topic generator for Indian students practicing English speaking.
+
+${catInstruction}
+${diffInstruction}
+
+Generate ONE unique, current, real-world speech topic for 2025. Avoid generic clichés.
+Return ONLY a JSON object:
+{
+  "topic": "The topic — punchy, specific, max 15 words",
+  "category": "one of: gd/current/abstract/social/motivational/tech/career/india",
+  "difficulty": 1, 2, or 3,
+  "hint": "2-3 sentences: specific angles to cover, data points to mention, real examples to use."
+}
+No markdown. Only JSON.`;
+
+  let apiWorked = false;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 300,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    clearTimeout(timeout);
+    if (res.ok) {
+      const data = await res.json();
+      const raw = data.content[0].text.trim();
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      applyTopic(parsed);
+      apiWorked = true;
+    }
+  } catch (e) { /* fall through */ }
+
+  if (!apiWorked) {
+    const fb = getTopicFromBank(difficulty, currentCat);
+    applyTopic(fb);
+    showToast('Topic from local bank');
   }
 
-  const topic = pool[Math.floor(Math.random() * pool.length)];
-  document.getElementById("topic").innerText = topic;
+  btn.disabled = false;
+}
+
+function applyTopic(parsed) {
+  currentTopic = parsed.topic;
+  const cat  = parsed.category || currentCat;
+  const diff = parsed.difficulty || 2;
+  const colors = (catColors[cat] || catColors['all']).split('|');
+  const pill = document.getElementById('catPill');
+  pill.textContent = catLabels[cat] || cat;
+  pill.style.background   = colors[0];
+  pill.style.borderColor  = colors[1];
+  pill.style.color        = colors[2];
+
+  document.getElementById('topicQ').textContent = parsed.topic;
+  document.getElementById('topicHint').innerHTML = parsed.hint.replace(
+    /\b(key point|start with|mention|discuss|talk about|consider|include|cover|compare|use|draw)\b/gi,
+    w => `<strong>${w}</strong>`
+  );
+
+  const dots = document.querySelectorAll('.diff-dot');
+  dots.forEach((d, i) => {
+    d.className = 'diff-dot' + (i < diff ? ' on' : '');
+  });
+  document.getElementById('loadingState').classList.remove('show');
+  const ts = document.getElementById('topicState');
+  ts.style.display = 'block';
+  const tq = document.getElementById('topicQ');
+  tq.classList.remove('topic-exit');
+  tq.classList.add('topic-enter');
+  tq.addEventListener('animationend', () => tq.classList.remove('topic-enter'), { once: true });
+
+  document.getElementById('cardWrap').classList.add('lit');
+  setTimeout(() => document.getElementById('cardWrap').classList.remove('lit'), 2000);
+  count++;
+  streak = lastDone ? streak + 1 : 1;
+  lastDone = false;
+  bumpStat('countStat', count);
+  document.getElementById('streakNum').textContent = streak;
+
+  history.unshift({ topic: parsed.topic, cat: catLabels[cat] || cat });
+  if (history.length > 6) history.pop();
+  renderHistory();
+}
+
+function bumpStat(id, val) {
+  const el = document.getElementById(id);
+  el.textContent = val;
+  el.classList.add('stat-bump');
+  el.addEventListener('animationend', () => el.classList.remove('stat-bump'), { once: true });
+}
+
+function renderHistory() {
+  const el = document.getElementById('histList');
+  if (!history.length) {
+    el.innerHTML = '<div class="empty"><div class="big">🎤</div>Your recent topics will appear here.<br>Generate your first AI topic above!</div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) =>
+    `<div class="hist-item hist-enter" style="animation-delay:${i * 0.05}s" onclick="reuseHistTopic(${i})">
+      <span class="hist-tag">${h.cat}</span>
+      <span class="hist-text">${h.topic}</span>
+    </div>`
+  ).join('');
+}
+
+function reuseHistTopic(i) {
+  document.getElementById('topicQ').textContent = history[i].topic;
+  document.getElementById('catPill').textContent = history[i].cat;
+  currentTopic = history[i].topic;
+  showToast('Topic reloaded ✓');
+}
+
+function copyTopic() {
+  if (!currentTopic) { showToast('Generate a topic first!'); return; }
+  navigator.clipboard.writeText(currentTopic).then(() => showToast('Copied to clipboard ✓'));
+}
+
+function shareTopic() {
+  if (!currentTopic) { showToast('Generate a topic first!'); return; }
+  const text = `🎤 My speech practice topic:\n"${currentTopic}"\n\nPractice with Spiel AI!`;
+  if (navigator.share) {
+    navigator.share({ title: 'Spiel Topic', text });
+  } else {
+    navigator.clipboard.writeText(text);
+    showToast('Copied for sharing ✓');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function setTime(secs) {
+  resetTimer();
+  timerMax = timerLeft = secs;
+  document.querySelectorAll('.t-pre').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  updateTimerUI();
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInt);
+    timerRunning = false;
+    document.getElementById('startBtn').textContent = '▶ Resume';
+    document.getElementById('progBg').classList.remove('prog-running');
+  } else {
+    openOverlay();
+    timerRunning = true;
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+    document.getElementById('progBg').classList.add('prog-running');
+    timerInt = setInterval(() => {
+      timerLeft--;
+      if (timerLeft <= 0) {
+        timerLeft = 0;
+        clearInterval(timerInt);
+        timerRunning = false;
+        document.getElementById('startBtn').textContent = '▶ Start';
+        document.getElementById('progBg').classList.remove('prog-running');
+        sessions++;
+        lastDone = true;
+        bumpStat('sessionStat', sessions);
+        document.getElementById('sessionCount').textContent = sessions + ' done';
+        timerDone();
+      }
+      updateTimerUI();
+      updateOverlayUI();
+    }, 1000);
+  }
+}
+
+function openOverlay() {
+  const overlay = document.getElementById('timerOverlay');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  updateOverlayUI();
+  document.getElementById('toTopic').textContent =
+    currentTopic || '🎤 Speak on any topic you choose!';
+  document.getElementById('toPauseBtn').textContent = '⏸ Pause';
+}
+
+function closeOverlay() {
+  const overlay = document.getElementById('timerOverlay');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function overlayToggle() {
+  if (timerRunning) {
+    clearInterval(timerInt);
+    timerRunning = false;
+    document.getElementById('toPauseBtn').textContent = '▶ Resume';
+    document.getElementById('startBtn').textContent = '▶ Resume';
+    document.getElementById('progBg').classList.remove('prog-running');
+  } else {
+    timerRunning = true;
+    document.getElementById('toPauseBtn').textContent = '⏸ Pause';
+    document.getElementById('startBtn').textContent = '⏸ Pause';
+    document.getElementById('progBg').classList.add('prog-running');
+    timerInt = setInterval(() => {
+      timerLeft--;
+      if (timerLeft <= 0) {
+        timerLeft = 0;
+        clearInterval(timerInt);
+        timerRunning = false;
+        document.getElementById('startBtn').textContent = '▶ Start';
+        document.getElementById('progBg').classList.remove('prog-running');
+        sessions++;
+        lastDone = true;
+        bumpStat('sessionStat', sessions);
+        document.getElementById('sessionCount').textContent = sessions + ' done';
+        timerDone();
+      }
+      updateTimerUI();
+      updateOverlayUI();
+    }, 1000);
+  }
+}
+
+function overlayReset() {
+  clearInterval(timerInt);
+  timerRunning = false;
+  timerLeft = timerMax;
+  document.getElementById('toPauseBtn').textContent = '▶ Resume';
+  document.getElementById('startBtn').textContent = '▶ Start';
+  document.getElementById('progBg').classList.remove('prog-running');
+  updateTimerUI();
+  updateOverlayUI();
+  const overlay = document.getElementById('timerOverlay');
+  overlay.classList.remove('warn-mode','crit-mode');
+}
+
+function updateOverlayUI() {
+  const m = Math.floor(timerLeft / 60);
+  const s = timerLeft % 60;
+  const timeStr = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const toTime = document.getElementById('toTime');
+  toTime.textContent = timeStr;
+
+  const overlay = document.getElementById('timerOverlay');
+ 
+  toTime.className = 'to-time' + (timerLeft <= 10 ? ' crit' : timerLeft <= 30 ? ' warn' : '');
+  overlay.classList.toggle('warn-mode', timerLeft <= 30 && timerLeft > 10);
+  overlay.classList.toggle('crit-mode', timerLeft <= 10);
+  const pct = timerMax > 0 ? timerLeft / timerMax : 1;
+  const circ = 2 * Math.PI * 160; // r=160
+  document.getElementById('toProgressBar').style.strokeDashoffset = circ * (1 - pct);
+}
+
+function timerDone() {
+ 
+  const fb = document.getElementById('flashBurst');
+  fb.classList.add('go');
+  fb.addEventListener('animationend', () => fb.classList.remove('go'), { once: true });
+
+  document.getElementById('toTime').textContent = '00:00';
+  document.getElementById('toPauseBtn').textContent = '▶ Start';
+  showToast('🎉 Time up! Great session!');
+
+  // Auto close overlay after 2.5s
+  setTimeout(() => closeOverlay(), 2500);
+}
+
+function resetTimer() {
+  clearInterval(timerInt);
+  timerRunning = false;
+  timerLeft = timerMax;
+  document.getElementById('startBtn').textContent = '▶ Start';
+  document.getElementById('progBg').classList.remove('prog-running');
+  updateTimerUI();
+}
+
+function updateTimerUI() {
+  const m = Math.floor(timerLeft / 60);
+  const s = timerLeft % 60;
+  const el = document.getElementById('timerNum');
+  el.classList.add('digit-flip');
+  el.addEventListener('animationend', () => el.classList.remove('digit-flip'), { once: true });
+  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  el.className = 'timer-num' + (timerLeft <= 10 ? ' crit' : timerLeft <= 30 ? ' warn' : '');
+  if (timerLeft <= 10 && timerRunning) el.style.animation = 'blink 0.5s infinite';
+  else el.style.animation = '';
+  const pct = timerMax > 0 ? (timerLeft / timerMax) * 100 : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+document.querySelectorAll('.t-pre').forEach(b => {
+  b.addEventListener('click', function() {
+    document.querySelectorAll('.t-pre').forEach(x => x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+renderHistory();
+
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  const icon = document.getElementById('themeIcon');
+  if (isDark) {
+    icon.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
 }
 </script>
-
-
-
-
 </body>
-
-
-
 </html>
