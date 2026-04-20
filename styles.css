@@ -1,14 +1,15 @@
 body {
-  font-family: sans-serif;
+  font-family: 'Arial', sans-serif;
   background: #08090c;
-  color: white;
+  color: #f0eee8;
   text-align: center;
   margin: 0;
 }
 
 header {
   padding: 20px;
-  font-size: 24px;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .hero {
@@ -21,25 +22,34 @@ header {
 
 .filters button {
   margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  background: #222;
-  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  background: #111;
+  color: #aaa;
   cursor: pointer;
+}
+
+.filters button:hover {
+  color: white;
+  border-color: #666;
 }
 
 .card {
   margin: 30px auto;
-  padding: 20px;
+  padding: 25px;
   width: 60%;
-  border: 1px solid #333;
-  border-radius: 10px;
+  border-radius: 15px;
+  background: #0f1117;
+  border: 1px solid #222;
 }
 
 .generate-btn {
-  padding: 10px 20px;
-  background: #444;
-  color: white;
+  padding: 12px 24px;
+  background: #c8f135;
+  color: #08090c;
   border: none;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: bold;
 }
