@@ -18,10 +18,10 @@
 </section>
 
 <div class="filters">
-  <button>All</button>
-  <button>Tech</button>
-  <button>Career</button>
-  <button>Fun</button>
+<button onclick="setCategory('all')">All</button>
+<button onclick="setCategory('tech')">Tech</button>
+<button onclick="setCategory('career')">Career</button>
+<button onclick="setCategory('fun')">Fun</button>
 </div>
 
 <div class="card fade-in">
@@ -48,18 +48,25 @@ const topics = {
   ]
 };
 
-function generateTopic() {
-  const categories = Object.keys(topics);
-  const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-  
-  const selected = topics[randomCategory];
-  const topic = selected[Math.floor(Math.random() * selected.length)];
+let currentCategory = "all";
 
+function setCategory(cat) {
+  currentCategory = cat;
+}
+
+function generateTopic() {
+  let pool = [];
+
+  if (currentCategory === "all") {
+    pool = Object.values(topics).flat();
+  } else {
+    pool = topics[currentCategory];
+  }
+
+  const topic = pool[Math.floor(Math.random() * pool.length)];
   document.getElementById("topic").innerText = topic;
 }
 </script>
-
-
 
 
 
