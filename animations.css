@@ -12,7 +12,3 @@
     transform: translateY(0);
   }
 }
-
-.card {
-  animation: fadeUp 0.1s infinite;
-}
